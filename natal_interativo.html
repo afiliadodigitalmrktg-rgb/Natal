@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07130f">
+<title>Uma surpresa de Natal</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#173d2d 0,#07130f 58%,#020806 100%);color:#fff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;display:grid;place-items:center}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+main{position:relative;z-index:2;text-align:center;padding:24px;width:min(100%,520px)}
+.kicker{letter-spacing:.22em;text-transform:uppercase;font-size:.7rem;color:#d9c88b}
+h1{font-family:Georgia,serif;font-size:clamp(2rem,8vw,3.2rem);font-weight:400;margin:.5rem 0;color:#f7e9b5;text-shadow:0 0 25px #e7bd5a55}
+.tree{position:relative;width:220px;height:260px;margin:14px auto 22px;filter:drop-shadow(0 0 20px #4aff9a33);cursor:pointer;transition:transform .3s}
+.tree:active{transform:scale(.96)}
+.layer{position:absolute;left:50%;transform:translateX(-50%);width:0;height:0;border-left:var(--w) solid transparent;border-right:var(--w) solid transparent;border-bottom:var(--h) solid #16784a;filter:drop-shadow(0 5px 0 #08442c)}
+.l1{top:30px;--w:55px;--h:80px}.l2{top:75px;--w:78px;--h:100px;border-bottom-color:#11633e}.l3{top:130px;--w:103px;--h:110px;border-bottom-color:#0d5536}
+.trunk{position:absolute;top:225px;left:calc(50% - 13px);width:26px;height:32px;background:#80502e;border-radius:3px}
+.star{position:absolute;top:0;left:calc(50% - 17px);font-size:34px;color:#ffe78a;text-shadow:0 0 8px #fff2a8,0 0 24px #ffcc4d;animation:pulse 1.5s infinite alternate}
+.orn{position:absolute;font-size:18px;text-shadow:0 0 12px currentColor;animation:twinkle 1.3s infinite alternate}
+.o1{top:88px;left:82px;color:#ff5c67}.o2{top:124px;left:135px;color:#ffd45c}.o3{top:162px;left:68px;color:#6bdcff}.o4{top:185px;left:145px;color:#ff79d1}.o5{top:147px;left:105px;color:#fff}
+button{border:1px solid #d9c88b;background:linear-gradient(135deg,#b58b3d,#e8cb7b);color:#172016;padding:14px 23px;border-radius:999px;font-weight:750;font-size:1rem;box-shadow:0 8px 30px #d4a94a33;cursor:pointer}
+.hint{color:#c4d4c9;font-size:.92rem;margin:12px 0 0}.message{min-height:70px;margin-top:18px;font-family:Georgia,serif;font-size:1.35rem;color:#ffe9b1;opacity:0;transform:translateY(10px);transition:.7s}.message.show{opacity:1;transform:translateY(0)}
+.small{color:#9bb4a4;font-size:.75rem;margin-top:12px}
+@keyframes pulse{to{transform:scale(1.18) rotate(8deg);filter:brightness(1.4)}}@keyframes twinkle{to{filter:brightness(1.8);transform:scale(1.25)}}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<main>
+ <div class="kicker">Uma pequena surpresa para você</div>
+ <h1>O Natal está chegando...</h1>
+ <div class="tree" id="tree" role="button" tabindex="0" aria-label="Tocar na árvore para revelar a surpresa">
+  <div class="star">★</div><div class="layer l1"></div><div class="layer l2"></div><div class="layer l3"></div><div class="trunk"></div>
+  <span class="orn o1">●</span><span class="orn o2">✦</span><span class="orn o3">●</span><span class="orn o4">✦</span><span class="orn o5">●</span>
+ </div>
+ <button id="reveal">✨ Toque para acender a magia</button>
+ <div class="hint">A árvore está esperando seu toque.</div>
+ <div class="message" id="message">Que nunca faltem luz, carinho e motivos para sorrir.<br><strong>Feliz Natal! ❤️</strong></div>
+ <div class="small">Feito com carinho 🎄</div>
+</main>
+<script>
+const c=document.getElementById('fx'),ctx=c.getContext('2d');let w,h,flakes=[],sparkles=[],active=false;
+function resize(){w=c.width=innerWidth*devicePixelRatio;h=c.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);w=innerWidth;h=innerHeight}
+addEventListener('resize',resize);resize();
+for(let i=0;i<95;i++)flakes.push({x:Math.random()*w,y:Math.random()*h,r:1+Math.random()*2.5,s:.5+Math.random()*1.5,dr:(Math.random()-.5)*.7});
+function draw(){ctx.clearRect(0,0,w,h);for(const f of flakes){f.y+=f.s;f.x+=f.dr;if(f.y>h+5){f.y=-5;f.x=Math.random()*w}if(f.x>w+5)f.x=-5;if(f.x< -5)f.x=w+5;ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.78)';ctx.fill()}
+if(active){sparkles=sparkles.filter(p=>p.life-->0);for(const p of sparkles){p.x+=p.vx;p.y+=p.vy;p.vy+=.025;ctx.globalAlpha=Math.max(0,p.life/65);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1}
+requestAnimationFrame(draw)}draw();
+function reveal(){if(active)return;active=true;document.getElementById('message').classList.add('show');document.querySelector('h1').textContent='A magia é compartilhar!';document.querySelector('.hint').textContent='Surpresa revelada ✨';document.getElementById('reveal').textContent='❤️ Feliz Natal!';for(let i=0;i<180;i++){const a=Math.random()*Math.PI*2,s=1+Math.random()*4;sparkles.push({x:w/2,y:h*.43,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:1+Math.random()*2,life:35+Math.random()*35,color:['#ffe28a','#ffffff','#ff6b83','#7cf0b0'][i%4]})}}
+document.getElementById('reveal').addEventListener('click',reveal);document.getElementById('tree').addEventListener('click',reveal);document.getElementById('tree').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();reveal()}});
+</script>
+</body></html>
